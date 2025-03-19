@@ -56,10 +56,10 @@ def load_config(config_file='config.json'):
         logger.error(f"Config file '{config_file}' not found.")
         exit(1)
     except json.JSONDecodeError:
-        logger.error(f"Error parsing config file '{config_file}'. Please ensure it's valid JSON.")
+        logger.error(f"Failure parsing config file '{config_file}'. Please ensure it's valid JSON.")
         exit(1)
     except Exception as e:
-        logger.error(f"Error loading config: {str(e)}")
+        logger.error(f"Failure loading config: {str(e)}")
         exit(1)
 
 
@@ -103,7 +103,7 @@ def get_image_files(directory, max_file_size_mb, max_photos):
         logger.error(f"Directory '{directory}' not found.")
         exit(1)
     except Exception as e:
-        logger.error(f"Error reading directory: {str(e)}")
+        logger.error(f"get_image_files() Exception: {str(e)}")
         exit(1)
 
 
@@ -134,7 +134,7 @@ def setup_webdriver():
         driver.set_page_load_timeout(60)
         return driver
     except Exception as e:
-        logger.error(f"Error setting up WebDriver: {str(e)}")
+        logger.error(f"Failed setting up WebDriver: {str(e)}")
         exit(1)
 
 
@@ -175,7 +175,7 @@ def login_to_nixplay(driver, base_url, username, password):
         save_debug_snapshot(driver, "login_failed_timeout")
         return False
     except Exception as e:
-        logger.error(f"Error during login: {str(e)}")
+        logger.error(f"Failed to login: {str(e)}")
         save_debug_snapshot(driver, "login_failed_exception")
         return False
 
@@ -212,7 +212,7 @@ def find_playlist(driver, base_url, playlist_name):
         return True
 
     except Exception as e:
-        logger.error(f"Error finding playlist: {repr(e)}")
+        logger.error(f"Could not find playlist: {repr(e)}")
         traceback.print_exc()
         save_debug_snapshot(driver, "find_playlist_error")
         return False
@@ -281,12 +281,12 @@ def delete_all_photos(driver, timeout=10):
             return True
 
     except TimeoutException as e:
-        logger.error(f"⚠️ TimeoutException: {str(e)}")
+        logger.error(f"delete_all_photos() TimeoutException: {str(e)}")
         save_debug_snapshot(driver, "timeout_exception")
         return False
 
     except Exception as e:
-        logger.error(f"❌ Exception: {str(e)}")
+        logger.error(f"delete_all_photos() Exception: {str(e)}")
         save_debug_snapshot(driver, "unexpected_exception")
         return False
 
@@ -384,7 +384,7 @@ def upload_batch(driver, batch, batch_number, batch_count, batch_end_count, logf
     while True:
         # Check for absolute timeout
         if time.time() - start_time > max_upload_time:
-            logger.info(f"\n⏱️ Maximum upload time ({max_upload_time}s) reached. Assuming complete.")
+            logger.info(f"\nMaximum upload time ({max_upload_time}s) reached. Assuming complete.")
             break
             
         time.sleep(2)
@@ -430,26 +430,26 @@ def upload_batch(driver, batch, batch_number, batch_count, batch_end_count, logf
                 # If we reached the expected end count for this batch, exit
                 if current_progress >= batch_end_count:
                     time.sleep(5)  # Give it 5 seconds after reaching target
-                    logger.debug(f"\n✅ Upload reached target {batch_end_count} - batch complete")
+                    logger.debug(f"\nUpload reached target {batch_end_count} - batch complete")
                     break
             else:
                 print(f"\rUploading: Waiting for progress update... ('{text}')", end="")
                 
             # Check for stalled progress
             if time.time() - last_progress_change_time > stall_timeout:
-                logger.info(f"\n⚠️ Progress stalled for {stall_timeout}s - assuming upload complete")
+                logger.info(f"\nProgress stalled for {stall_timeout}s - assuming upload complete")
                 break
                 
         except NoSuchElementException:
             # Progress element has disappeared
-            logger.info("\n✅ Upload complete - progress indicator disappeared. Continuing")
+            logger.info("\nUpload complete - progress indicator disappeared. Continuing")
             break
         except Exception as e:
-            logger.warning(f"\n⚠️ Error reading progress: {e}. Continuing")
+            logger.warning(f"\nWarning reading progress: {e}. Continuing")
             # Don't update the last_progress_change_time on errors
     
     print(f"\r")
-    logger.debug(f"✅ Batch {batch_number} upload complete.")
+    logger.debug(f"Batch {batch_number} upload complete.")
     return True
 
 
@@ -507,7 +507,7 @@ def upload_photos(driver, selected_images, batch_size):
         return True
         
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        logger.error(f"upload_photos() Exception: {e}")
         save_debug_snapshot(driver, "upload_exception")
         return False
         
@@ -537,7 +537,7 @@ def main():
             exit(1)
         
         if not find_playlist(driver, base_url, playlist_name):
-            logger.error("Could not find playlist. Exiting.")
+            logger.error(f"Could not find playlist '{playlist_name}'. Exiting.")
             exit(1)
         
         if not delete_all_photos(driver):
@@ -549,7 +549,7 @@ def main():
         
         logger.info("Nixplay photo upload completed successfully!")
     except Exception as e:
-        logger.error(f"An unexpected error occurred: {str(e)}")
+        logger.error(f"main() Exception: {str(e)}")
         save_debug_snapshot(driver, "unexpected_error")
     finally:
         logger.debug("Closing WebDriver...")
