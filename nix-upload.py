@@ -352,12 +352,17 @@ def upload_batch(driver, batch, batch_number, batch_count, batch_end_count, logf
         # Debug print: List of files to be sent
         files_to_send = "\n".join([os.path.abspath(f) for f in batch])
         logger.debug("Debug: Files being sent to input field:\n" + files_to_send)
-        logfile.write(files_to_send)
         file_input.send_keys(files_to_send)
+        try:
+            logfile.write(files_to_send)
+        except Exception as e:
+            logger.warning(f"Error writing log of files: {e}, continuing")
+            
     except Exception as e:
-        logger.warning(f"❌ Error sending files to input: {e}, continuing")
+        logger.warning(f"Error sending files to input: {e}, continuing")
         save_debug_snapshot(driver, f"upload_input_error_batch_{batch_number}")
         return False
+        
         
     # Monitor upload progress
     logger.debug("Waiting for upload progress indicator...")
@@ -459,8 +464,14 @@ def upload_photos(driver, selected_images, batch_size):
         # Write cumulative list to debug file
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         debug_file_name = f"{timestamp}_uploaded_files.txt"
-        debug_file_path = os.path.join("debug_screenshots", debug_file_name)  # Use debug_screenshots directory
-        logfile=open(debug_file_path, "w")
+        logfile=None
+        try:
+            # os.makedirs("debug", exist_ok=True)
+            debug_file_path = os.path.join("debug", debug_file_name)  # Use debug_screenshots directory
+            logfile=open(debug_file_path, "w")
+        except Exception as e:
+            logger.warning(f"Error creating {debug_file_name}. Continuing")
+           
        
         for i in range(0, len(selected_images), batch_size):
             batch = selected_images[i:i + batch_size]
@@ -492,7 +503,6 @@ def upload_photos(driver, selected_images, batch_size):
             
         logger.info("All batches uploaded.")
         
-        logfile.close()
         logger.info(f"List of all uploaded files written to {debug_file_path}")
         return True
         
