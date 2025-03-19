@@ -17,3 +17,8 @@ To run:
 1. open a command shell in the "nix-upload" directory on your computer
 2. Run "python nix-upload.py"
 
+
+Known issues:
+- I dont know why this warning shows, but it seems to be a benign message
+"Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors (tensor#-1 is a dynamic-sized tensor)."
+- In your config.json file, set "max_photos" to not more than 1900, and "batch_size" to not more than 100, for best performance
