@@ -1,7 +1,7 @@
 # nix-upload
 Given a directory on your computer, this script will locate all photos (recursively) under that directory, and upload all of the photos to a specified nixplay playlist.
 
-To install:
+## To install:
 1. Install python (I have tested with python 3.13.2 on Windows 11)
 2. Install selenium and webdriver-manager
 	pip install selenium
@@ -13,12 +13,12 @@ To install:
 	2b. copy the nix-upload.py file
 	
 	
-To run:
+## To run:
 1. open a command shell in the "nix-upload" directory on your computer
 2. Run "python nix-upload.py"
 
 
-Known issues:
+## Known issues:
 - I dont know why this warning shows, but it seems to be a benign message
 "Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors (tensor#-1 is a dynamic-sized tensor)."
 - In your config.json file, set "max_photos" to not more than 1900, and "batch_size" to not more than 100, for best performance
