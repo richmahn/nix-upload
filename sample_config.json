@@ -1,0 +1,10 @@
+{
+    "username": "USERNAME",
+    "password": "PASSWORD",
+    "playlist_name": "nix-upload",
+    "photos_directory": "PATH/TO/ROOT/OF/YOUR/PHOTOS/DIR",
+    "max_photos": 30,
+    "base_url": "https://app.nixplay.com",
+	"max_file_size_mb": 20,
+	"batch_size": 10
+}
